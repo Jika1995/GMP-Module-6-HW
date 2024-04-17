@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext", /* Specify what module code is generated. */
+    "moduleResolution": "node",
+    "baseUrl": "src",
+    "outDir": "dist",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "strict": true, /* Enable all strict type-checking options. */
+  },
+  "include": [
+    "src/**/*"
+  ],
+}
