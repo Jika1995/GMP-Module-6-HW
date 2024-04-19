@@ -1,7 +1,7 @@
 import express from 'express';
-import { CartController } from 'controllers/cart.controller';
-import { joiMiddleware } from 'middlewares/joi.middleware';
-import { schemas } from 'schemas/schemas';
+import { CartController } from '../controllers/cart.controller.js';
+import { joiMiddleware } from '../middlewares/joi.middleware.js';
+import { schemas } from '../schemas/schemas.js';
 
 export const cartRouter = express.Router();
 

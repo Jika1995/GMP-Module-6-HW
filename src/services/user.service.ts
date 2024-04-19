@@ -1,5 +1,5 @@
-import { UserRepository } from "repositories/users.repository";
-import { UserEntity } from "schemas/user.entity";
+import { UserRepository } from "../repositories/users.repository.js";
+import { UserEntity } from "../schemas/user.entity.js";
 
 export const UserService = {
   getAll: async (): Promise<UserEntity[]> => {

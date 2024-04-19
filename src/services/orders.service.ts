@@ -1,5 +1,5 @@
-import { OrderRepository } from "repositories/orders.repository";
-import { OrderEntity } from "schemas/order.entity";
+import { OrderRepository } from "../repositories/orders.repository.js";
+import { OrderEntity } from "../schemas/order.entity.js";
 
 export const OrderService = {
   getAll: async (): Promise<OrderEntity[]> => {

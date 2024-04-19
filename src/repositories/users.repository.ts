@@ -1,4 +1,4 @@
-import { UserEntity } from "schemas/user.entity";
+import { UserEntity } from '../schemas/user.entity.js';
 import { readFile, writeFile } from 'fs/promises';
 import { randomUUID } from "crypto";
 

@@ -1,6 +1,6 @@
-import { CartEntity, CartItemEntity } from "schemas/cart.entity";
 import { randomUUID } from "crypto";
 import { readFile, writeFile } from 'fs/promises';
+import { CartEntity, CartItemEntity } from "../schemas/cart.entity.js";
 
 const CARTS_FILE_PATH = 'src/db/carts.json';
 

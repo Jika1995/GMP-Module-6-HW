@@ -1,8 +1,8 @@
-import { CartRepository } from "repositories/carts.repository";
-import { OrderRepository } from "repositories/orders.repository";
-import { ProductRepository } from "repositories/products.repository";
-import { CartEntity, CartItemEntity, CartItemRequestBody } from "schemas/cart.entity";
-import { OrderEntity } from "schemas/order.entity";
+import { CartRepository } from "../repositories/carts.repository.js"
+import { OrderRepository } from "../repositories/orders.repository.js"
+import { ProductRepository } from "../repositories/products.repository.js"
+import { OrderEntity } from "../schemas/order.entity.js"
+import { CartEntity, CartItemRequestBody } from "../schemas/cart.entity.js"
 
 export const CartService = {
   getAll: async (): Promise<CartEntity[]> => {

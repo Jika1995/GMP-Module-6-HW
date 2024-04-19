@@ -1,5 +1,5 @@
-import { ProductRepository } from "repositories/products.repository";
-import { ProductEntity } from "schemas/product.entity";
+import { ProductRepository } from "../repositories/products.repository.js";
+import { ProductEntity } from "../schemas/product.entity.js";
 
 export const ProductService = {
   getAll: async (): Promise<ProductEntity[]> => {

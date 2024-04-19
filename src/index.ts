@@ -1,7 +1,8 @@
 import express from "express";
-import { productsRouter } from "./routes/products.routes";
-import { cartRouter } from "./routes/carts.routes";
-import { authMiddleware } from "./middlewares/auth.middleware";
+
+import { cartRouter } from "./routes/carts.routes.js";
+import { authMiddleware } from "./middlewares/auth.middleware.js";
+import { productsRouter } from "./routes/products.routes.js";
 
 const PORT = 8000;
 const app = express();

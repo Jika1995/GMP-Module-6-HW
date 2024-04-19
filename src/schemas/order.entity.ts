@@ -1,4 +1,4 @@
-import { CartItemEntity } from "./cart.entity";
+import { CartItemEntity } from "./cart.entity.js";
 
 type ORDER_STATUS = 'created' | 'completed';
 

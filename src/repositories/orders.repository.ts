@@ -1,7 +1,7 @@
-import { OrderEntity } from "schemas/order.entity";
+import { OrderEntity } from "../schemas/order.entity.js";
 import { randomUUID } from "crypto";
-import { CartEntity } from "schemas/cart.entity";
-import { countTotal } from "utils/utils";
+import { CartEntity } from "../schemas/cart.entity.js";
+import { countTotal } from "../utils/utils.js";
 import { readFile, writeFile } from 'fs/promises';
 
 const ORDERS_FILE_PATH = 'src/db/orders.json';

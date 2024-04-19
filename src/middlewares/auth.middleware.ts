@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { UserService } from "services/user.service";
-import { sendError } from "utils/utils";
+import { UserService } from "../services/user.service.js";
+import { sendError } from "../utils/utils.js";
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const userId = req.get('x-user-id');

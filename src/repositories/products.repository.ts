@@ -1,4 +1,4 @@
-import { ProductEntity } from "schemas/product.entity";
+import { ProductEntity } from '../schemas/product.entity.js';
 import { readFile, writeFile } from 'fs/promises';
 
 const PRODUCTS_FILE_PATH = 'src/db/products.json';

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { ProductService } from 'services/products.service';
-import { MyCustomError } from 'utils/customError';
-import { sendError, sendOk } from 'utils/utils';
+import { ProductService } from '../services/products.service.js';
+import { MyCustomError } from "../utils/customError.js";
+import { sendError, sendOk } from "../utils/utils.js";
 
 export const ProductController = {
   getAllProducts: async (req: Request, res: Response): Promise<void> => {

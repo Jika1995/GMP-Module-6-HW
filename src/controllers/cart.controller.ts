@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { CartService } from 'services/carts.service';
-import { countTotal, sendError, sendOk } from 'utils/utils';
+import { CartService } from '../services/carts.service.js';
+import { countTotal, sendError, sendOk } from '../utils/utils.js';
 
 export const CartController = {
   getAllCarts: async (req: Request, res: Response): Promise<void> => {
