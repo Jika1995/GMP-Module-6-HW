@@ -1,49 +1,59 @@
 import { UserEntity } from "schemas/user.entity";
-import { readFileSync, writeFileSync } from 'fs';
+import { readFile, writeFile } from 'fs/promises';
 import { randomUUID } from "crypto";
 
-let users: UserEntity[] = loadUsers();
+const USERS_FILE_PATH = 'src/db/users.json';
 
-function loadUsers(): UserEntity[] {
+async function loadUsers(): Promise<UserEntity[]> {
   try {
-    const data = readFileSync('src/db/users.json', 'utf-8');
+    const data = await readFile(USERS_FILE_PATH, 'utf-8');
     return JSON.parse(data);
   } catch (err) {
-    console.log(err);
-    return []
+    console.error('Error loading products:', err);
+    return [];
   }
 };
 
-function saveUsers() {
+async function saveUsers(users: UserEntity[]): Promise<void> {
   try {
-    writeFileSync("src/db/users.json", JSON.stringify(users), "utf-8")
+    await writeFile(USERS_FILE_PATH, JSON.stringify(users), "utf-8")
     console.log(`User saved successfully!`)
   } catch (error) {
-    console.log(`Error : ${ error }`)
+    console.error('Error saving products:', error);
   }
 };
 
-export const getUsers = async (): Promise<UserEntity[]> => {
-  const users = await loadUsers()
-  return users;
+export const UserRepository = {
+  getAll: async (): Promise<UserEntity[]> => {
+    const users = await loadUsers()
+    return users;
+  },
+  getOne: async (userId: string): Promise<UserEntity> => {
+    const users = await loadUsers();
+    const user = users.find((u: UserEntity) => u.id === userId);
+    if (!user) {
+      const customError = {
+        status: 404,
+        message: `User with this id: ${ userId } not found`,
+      };
+      throw customError;
+    }
+    return user;
+  },
+  create: async (): Promise<UserEntity> => {
+    const newUser = {
+      id: randomUUID()
+    };
+
+    try {
+      const users = await loadUsers();
+      users.push(newUser);
+      await saveUsers(users);
+      return newUser;
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw error; // Propagate the error to the caller
+    }
+  },
 }
-
-export const getUserById = async (userId: string) => {
-  const users = await loadUsers();
-  const user = users.find((u: UserEntity) => u.id === userId);
-  if (!user) {
-    throw new Error(`User with this id: ${ userId } not found`)
-  }
-  return user;
-};
-
-export const createUser = async () => {
-  const newUser = {
-    id: randomUUID()
-  };
-
-  const users = await getUsers();
-  users.push(newUser);
-  saveUsers()
-};
 

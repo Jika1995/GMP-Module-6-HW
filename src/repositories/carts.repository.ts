@@ -1,79 +1,101 @@
 import { CartEntity, CartItemEntity } from "schemas/cart.entity";
-import { readFileSync, writeFileSync } from 'fs';
 import { randomUUID } from "crypto";
+import { readFile, writeFile } from 'fs/promises';
 
-let carts: CartEntity[] = loadCarts();
+const CARTS_FILE_PATH = 'src/db/carts.json';
 
-function loadCarts(): CartEntity[] {
+async function loadCarts(): Promise<CartEntity[]> {
   try {
-    const data = readFileSync('src/db/carts.json', 'utf-8');
+    const data = await readFile(CARTS_FILE_PATH, 'utf-8');
     return JSON.parse(data);
   } catch (err) {
-    console.log(err);
-    return []
+    console.error('Error loading carts:', err);
+    return [];
   }
-};
+}
 
-function saveCarts() {
+async function saveCarts(carts: CartEntity[]): Promise<void> {
   try {
-    writeFileSync("src/db/carts.json", JSON.stringify(carts), "utf-8")
-    console.log(`Cart saved successfully!`)
+    await writeFile(CARTS_FILE_PATH, JSON.stringify(carts), "utf-8")
+    console.log(`Carts saved successfully!`)
   } catch (error) {
-    console.log(`Error : ${ error }`)
+    console.error('Error saving carts:', error);
   }
-};
-
-export const getCarts = async (): Promise<CartEntity[]> => {
-  const carts = await loadCarts()
-  return carts;
 }
 
-export const getCartById = async (cartId: string) => {
-  const carts = await loadCarts();
-  const cart = carts.find((c: CartEntity) => c.id === cartId);
-  if (!cart) {
-    throw new Error(`Cart with this id: ${ cartId } not found`)
-  }
-  return cart;
-};
-
-export const getCartByUserId = async (userId: string) => {
-  const carts = await loadCarts();
-  const cart = carts.find((c: CartEntity) => c.userId === userId);
-  if (!cart) {
-    const newCart = {
-      id: randomUUID(),
-      userId,
-      isDeleted: false,
-      items: []
+export const CartRepository = {
+  getAll: async (): Promise<CartEntity[]> => {
+    const carts = await loadCarts()
+    return carts;
+  },
+  getOne: async (userId: string): Promise<CartEntity> => {
+    const carts = await loadCarts();
+    const cart = carts.find((c: CartEntity) => c.userId === userId);
+    if (!cart) {
+      const newCart = {
+        id: randomUUID(),
+        userId,
+        isDeleted: false,
+        items: []
+      };
+      try {
+        carts.push(newCart);
+        return newCart;
+      } catch (error) {
+        console.error('Error creating cart as it did not exist:', error);
+        throw error; // Propagate the error to the caller
+      }
+    }
+    return cart;
+  },
+  update: async (userId: string, cartItem: CartItemEntity): Promise<CartEntity> => {
+    const cart = await CartRepository.getOne(userId);
+    if (!cart) {
+      const customError = {
+        status: 404,
+        message: 'Cart was not found'
+      }
+      throw customError;
     };
-    carts.push(newCart);
-    return newCart;
-  }
-  return cart;
-}
 
-export const updateUserCartByUserId = async (userId: string, cartItem: CartItemEntity) => {
-  const cart = await getCartByUserId(userId);
-  let cartItemIdx = cart?.items.findIndex((item) => item.product.id === cartItem.product.id);
+    const carts = await loadCarts();
 
-  if (cartItem.count === 0) {
-    cart.items.splice(cartItemIdx, 1);
-  };
+    const cartIdx = carts.findIndex((item) => item.id === cart.id);
+    let cartItemIdx = cart?.items.findIndex((item) => item.product.id === cartItem.product.id);
 
-  if (!cartItemIdx) {
-    cart.items.push(cartItem);
-  };
+    if (cartItem.count === 0) {
+      cart.items.splice(cartItemIdx, 1);
+    };
 
-  cart.items[cartItemIdx] = { ...cartItem }
-  saveCarts();
-  return cart;
-}
+    if (cartItemIdx === -1) {
+      cart.items.push(cartItem);
+    };
 
-export const makeUserCartEmpty = async (userId: string) => {
-  const carts = await loadCarts();
-  const cart = await getCartByUserId(userId);
-  const cartByIdx = carts.findIndex((item) => item.userId === userId);
-  carts[cartByIdx] = { ...cart, items: [] }
-  saveCarts();
-}
+    cart.items[cartItemIdx] = { ...cartItem };
+    carts[cartIdx] = { ...cart };
+    await saveCarts(carts);
+    return cart;
+  },
+  makeEmpty: async (userId: string): Promise<CartEntity> => {
+    const carts = await loadCarts();
+    const cart = carts.find((item) => item.userId === userId);
+    if (!cart) {
+      const customError = {
+        status: 404,
+        message: `Cart was not found`,
+      };
+      throw customError;
+    };
+    cart.items = [];
+    const cartIdx = carts.findIndex((item) => item.userId === userId);
+
+    try {
+      carts[cartIdx] = { ...cart };
+      await saveCarts(carts);
+      return cart;
+    } catch (error) {
+      console.error('Error making cart empty failed with error:', error);
+      throw error; // Propagate the error to the caller
+    }
+  },
+};

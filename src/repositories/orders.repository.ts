@@ -1,70 +1,81 @@
 import { OrderEntity } from "schemas/order.entity";
-import { readFileSync, writeFileSync } from 'fs';
 import { randomUUID } from "crypto";
-import { getCartByUserId } from "./carts.repository";
-import { CartItemEntity } from "schemas/cart.entity";
+import { CartEntity } from "schemas/cart.entity";
+import { countTotal } from "utils/utils";
+import { readFile, writeFile } from 'fs/promises';
 
-let orders: OrderEntity[] = loadOrders();
+const ORDERS_FILE_PATH = 'src/db/orders.json';
 
-function loadOrders(): OrderEntity[] {
+async function loadOrders(): Promise<OrderEntity[]> {
   try {
-    const data = readFileSync('src/db/orders.json', 'utf-8');
+    const data = await readFile(ORDERS_FILE_PATH, 'utf-8');
     return JSON.parse(data);
   } catch (err) {
-    console.log(err);
-    return []
+    console.error('Error loading orders:', err);
+    return [];
   }
 };
 
-function saveOrders() {
+async function saveOrders(orders: OrderEntity[]): Promise<void> {
   try {
-    writeFileSync("src/db/orders.json", JSON.stringify(orders), "utf-8")
-    console.log(`Order saved successfully!`)
+    await writeFile(ORDERS_FILE_PATH, JSON.stringify(orders), "utf-8")
+    console.log(`Orders saved successfully!`)
   } catch (error) {
-    console.log(`Error : ${ error }`)
+    console.error('Error saving orders:', error);
   }
 };
 
-export const getOrders = async (): Promise<OrderEntity[]> => {
-  const orders = await loadOrders()
-  return orders;
+export const OrderRepository = {
+  getAll: async (): Promise<OrderEntity[]> => {
+    const orders = await loadOrders()
+    return orders;
+  },
+  getOne: async (orderId: string): Promise<OrderEntity> => {
+    const orders = await loadOrders();
+    const order = orders.find((p: OrderEntity) => p.id === orderId);
+    if (!order) {
+      const customError = {
+        status: 404,
+        message: `Order with this id: ${ orderId } not found`,
+      };
+      throw customError;
+    }
+    return order;
+  },
+  create: async (userId: string, cart: CartEntity): Promise<OrderEntity> => {
+
+    const cartMockDetails: Omit<OrderEntity, 'id' | 'userId' | 'cartId' | 'total' | 'status' | 'items'> = {
+      payment: {
+        type: 'paypal',
+        address: 'London',
+        creditCard: '1234-1234-1234-1234'
+      },
+      delivery: {
+        type: 'post',
+        address: 'London'
+      },
+      comments: 'Deliver on time'
+    }
+    const newOrder: OrderEntity = {
+      id: randomUUID(),
+      userId,
+      cartId: cart.id,
+      items: cart.items,
+      payment: cartMockDetails.payment,
+      delivery: cartMockDetails.delivery,
+      comments: cartMockDetails.comments,
+      status: 'created',
+      total: countTotal(cart.items)
+    };
+
+    try {
+      const orders = await loadOrders();
+      orders.push(newOrder);
+      await saveOrders(orders);
+      return newOrder;
+    } catch (error) {
+      console.error('Error creating order:', error);
+      throw error; // Propagate the error to the caller
+    }
+  },
 }
-
-export const getOrderById = async (orderId: string) => {
-  const orders = await loadOrders();
-  const order = orders.find((p: OrderEntity) => p.id === orderId);
-  if (!order) {
-    throw new Error(`Order with this id: ${ orderId } not found`)
-  }
-  return order;
-};
-
-export const createOrder = async (userId: string, cartDetails: Omit<OrderEntity, 'id' | 'userId' | 'cartId' | 'total' | 'status'>) => {
-  const cart = await getCartByUserId(userId);
-  const newOrder: OrderEntity = {
-    id: randomUUID(),
-    userId,
-    cartId: cart.id,
-    items: cart.items,
-    payment: cartDetails.payment,
-    delivery: cartDetails.delivery,
-    comments: cartDetails.comments,
-    status: 'created',
-    total: countTotal(cart.items)
-  };
-
-  const orders = await loadOrders();
-  orders.push(newOrder);
-  saveOrders();
-};
-
-export const countTotal = (items: CartItemEntity[]) => {
-  let total = 0;
-
-  items.forEach((item) => {
-    const productTotalPrice = item.product.price * item.count;
-    total = total + productTotalPrice;
-  });
-
-  return total;
-};

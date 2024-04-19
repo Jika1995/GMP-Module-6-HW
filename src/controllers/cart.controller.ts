@@ -1,44 +1,58 @@
 import { Request, Response } from 'express';
-import { getCartByUserId, makeUserCartEmpty, updateUserCartByUserId } from 'repositories/carts.repository';
+import { CartService } from 'services/carts.service';
+import { countTotal, sendError, sendOk } from 'utils/utils';
 
-export const getUserCart = (async (req: Request, res: Response) => {
-  try {
-    const userId = req.get('x-user-id');
-    if (!userId) {
-      return res.status(400).send(`Missing fields in header: x-user-id`)
-    };
-    const cart = await getCartByUserId(userId);
-    res.json(cart);
-  } catch (err) {
-    console.log(err);
-    return res.sendStatus(400)
+export const CartController = {
+  getAllCarts: async (req: Request, res: Response): Promise<void> => {
+    try {
+      const carts = await CartService.getAll();
+      sendOk(res, 200, carts);
+    } catch (error) {
+      console.error('Error fetching carts:', error);
+      sendError(res, 500, 'Internal Server Error');
+    }
+  },
+  getUserCart: async (req: Request, res: Response) => {
+    const userId = req.params.userId;
+    try {
+      const cart = await CartService.getOneByUserId(userId);
+      const response = {
+        cart,
+        total: countTotal(cart.items)
+      }
+      sendOk(res, 200, response)
+    } catch (error) {
+      console.error(`Error fetching cart of user: ${ userId }`, error);
+      sendError(res, 500, 'Internal Server Error');
+    }
+  },
+  updateUserCart: async (req: Request, res: Response) => {
+    const userId = req.params.userId;
+    try {
+      const cart = await CartService.updateOneByUserId(userId, req.body);
+      const response = {
+        cart,
+        total: countTotal(cart.items)
+      };
+      sendOk(res, 201, response);
+    } catch (error) {
+      console.error(`Error updating cart of user: ${ userId }`, error);
+      sendError(res, 500, 'Internal Server Error');
+    }
+  },
+  deleteUserCart: async (req: Request, res: Response) => {
+    const userId = req.params.userId;
+    try {
+      const cart = await CartService.makeUserCartEmpty(userId);
+      if (cart) {
+        const response = {
+          success: true,
+        }
+        sendOk(res, 200, response)
+      }
+    } catch (error) {
+      console.error(`Error updating cart of user: ${ userId }`, error);
+      sendError(res, 500, 'Internal Server Error');
+    }
   }
-})
-
-export const updateUserCart = ((req: Request, res: Response) => {
-  try {
-    const userId = req.get('x-user-id');
-    if (!userId) {
-      return res.status(400).send(`Missing fields in header: x-user-id`)
-    };
-
-    const cart = updateUserCartByUserId(userId, req.body);
-    res.status(200).json(cart)
-  } catch (err) {
-    console.log(`Error : ${ err }`)
-  }
-});
-
-export const deleteUserCart = ((req: Request, res: Response) => {
-  try {
-    const userId = req.get('x-user-id');
-    if (!userId) {
-      return res.status(400).send(`Missing fields in header: x-user-id`)
-    };
-
-    makeUserCartEmpty(userId);
-    res.status(200).json('Cart is empty. You successfully deleted all items')
-  } catch (err) {
-    console.log(`Error : ${ err }`)
-  }
-});
+}

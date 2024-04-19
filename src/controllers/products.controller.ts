@@ -1,27 +1,31 @@
 import { Request, Response } from 'express';
-import { getProductById, getProducts } from 'repositories/products.repository';
+import { ProductService } from 'services/products.service';
+import { MyCustomError } from 'utils/customError';
+import { sendError, sendOk } from 'utils/utils';
 
-export const getAllProducts = async (req: Request, res: Response) => {
-  try {
-    const products = await getProducts();
-    res.json(products);
-  } catch (err) {
-    console.log(err);
-    return res.sendStatus(400)
-  }
-};
-
-export const getProduct = async (req: Request, res: Response) => {
-  try {
-    const productId = req.params.productId;
-    const product = await getProductById(productId);
-    if (!product) {
-      return res.status(404).send(`Product with id: ${ productId } does not exist`)
+export const ProductController = {
+  getAllProducts: async (req: Request, res: Response): Promise<void> => {
+    try {
+      const products = await ProductService.getAll();
+      sendOk(res, 200, products);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      sendError(res, 500, 'Internal Server Error');
     }
-    res.json(product);
-  } catch (err) {
-    console.log(err);
-    return res.sendStatus(400)
-  };
-};
+  },
+  getProductById: async (req: Request, res: Response): Promise<void> => {
+    const productId = req.params.productId;
+    try {
+      const product = await ProductService.getOneById(productId);
+      sendOk(res, 200, product);
+    } catch (error) {
+      console.error(`Error fetching product with id ${ productId }:`, error);
+      if (error instanceof MyCustomError) {
+        sendError(res, error.status, error.message);
+      } else {
+        sendError(res, 500, 'Internal Server Error');
+      }
+    }
+  }
+}
 

@@ -1,14 +1,33 @@
 {
   "compilerOptions": {
-    "module": "NodeNext", /* Specify what module code is generated. */
-    "moduleResolution": "node",
-    "baseUrl": "src",
-    "outDir": "dist",
+    "target": "ES2018",
+    "lib": [
+      "ES6",
+      "DOM"
+    ],
+    "module": "NodeNext",
+    "rootDir": "./src",
+    "resolveJsonModule": true,
+    "allowJs": true,
     "sourceMap": true,
+    "outDir": "./build",
+    "removeComments": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
     "noImplicitAny": true,
-    "strict": true, /* Enable all strict type-checking options. */
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*"
   ],
+  "exclude": [
+    "node_modules"
+  ],
+  "lib": [
+    "esnext"
+  ],
+  "ts-node": {
+    "esm": true
+  }
 }

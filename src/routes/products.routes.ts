@@ -1,7 +1,7 @@
 import express from 'express';
-import { getAllProducts, getProduct } from 'controllers/products.controller';
+import { ProductController } from 'controllers/products.controller';
 
 export const productsRouter = express.Router();
 
-productsRouter.get('/products', getAllProducts);
-productsRouter.get('/:productId', getProduct);
+productsRouter.get('/products', ProductController.getAllProducts);
+productsRouter.get('/:productId', ProductController.getProductById);

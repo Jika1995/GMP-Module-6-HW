@@ -1,8 +1,11 @@
 import express from 'express';
-import { deleteUserCart, getUserCart, updateUserCart } from 'controllers/cart.controller';
+import { CartController } from 'controllers/cart.controller';
+import { joiMiddleware } from 'middlewares/joi.middleware';
+import { schemas } from 'schemas/schemas';
 
 export const cartRouter = express.Router();
 
-cartRouter.get('/profile/cart', getUserCart);
-cartRouter.put('/profile/cart', updateUserCart);
-cartRouter.delete('/profile/cart', deleteUserCart);
+cartRouter.get('/profile/cart', CartController.getUserCart);
+cartRouter.put('/profile/cart', joiMiddleware(schemas.cartItemPOST), CartController.updateUserCart);
+cartRouter.delete('/profile/cart', CartController.deleteUserCart);
+cartRouter.post('/profile/cart/checkout', CartController.updateUserCart)
