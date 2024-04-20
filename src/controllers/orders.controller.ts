@@ -14,7 +14,7 @@ export const OrderController = {
     }
   },
   getOrderByUserId: async (req: Request, res: Response): Promise<void> => {
-    const userId = req.params.userId;
+    const userId = req.headers["x-user-id"] as string;
     try {
       const order = await OrderService.getOneByUserId(userId);
       sendOk(res, 200, order);

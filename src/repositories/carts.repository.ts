@@ -40,12 +40,13 @@ export const CartRepository = {
       };
       try {
         carts.push(newCart);
+        saveCarts(carts);
         return newCart;
       } catch (error) {
         console.error('Error creating cart as it did not exist:', error);
         throw error; // Propagate the error to the caller
       }
-    }
+    };
     return cart;
   },
   update: async (userId: string, cartItem: CartItemEntity): Promise<CartEntity> => {

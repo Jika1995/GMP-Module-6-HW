@@ -13,6 +13,7 @@ export const CartService = {
   },
   updateOneByUserId: async (userId: string, cartItemBody: CartItemRequestBody): Promise<CartEntity> => {
     const product = await ProductRepository.getOne(cartItemBody.product);
+    console.log('updated with product', product);
     if (!product) {
       const customError = {
         status: 400,
@@ -24,7 +25,7 @@ export const CartService = {
       product,
       count: cartItemBody.count
     };
-
+    console.log('cartItem to upd', cartItem)
     return await CartRepository.update(userId, cartItem);
   },
   makeUserCartEmpty: async (userId: string): Promise<CartEntity> => {

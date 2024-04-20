@@ -5,7 +5,7 @@ import { schemas } from '../schemas/schemas.js';
 
 export const cartRouter = express.Router();
 
-cartRouter.get('/profile/cart', CartController.getUserCart);
-cartRouter.put('/profile/cart', joiMiddleware(schemas.cartItemPOST), CartController.updateUserCart);
-cartRouter.delete('/profile/cart', CartController.deleteUserCart);
-cartRouter.post('/profile/cart/checkout', CartController.updateUserCart)
+cartRouter.get('/', CartController.getUserCart);
+cartRouter.put('/', joiMiddleware(schemas.cartItemPOST), CartController.updateUserCart);
+cartRouter.delete('/', CartController.deleteUserCart);
+cartRouter.post('/checkout', CartController.checkout)

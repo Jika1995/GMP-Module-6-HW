@@ -36,6 +36,7 @@ export const UserRepository = {
         status: 404,
         message: `User with this id: ${ userId } not found`,
       };
+      console.error('No such user')
       throw customError;
     }
     return user;

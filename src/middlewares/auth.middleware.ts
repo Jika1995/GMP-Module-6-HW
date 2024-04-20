@@ -12,6 +12,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     // Check if the user with the provided ID exists
     try {
       const isAuthenticated = await UserService.authenticate(userId);
+      console.log('isAuth', isAuthenticated)
       if (!isAuthenticated) {
         sendError(res, 401, `User with id ${ userId } is not authorized`);
       }
@@ -21,6 +22,4 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
       sendError(res, 500, 'Internal Server Error');
     }
   }
-
-  next();
 }

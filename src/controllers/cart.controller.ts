@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { CartService } from '../services/carts.service.js';
+import { MyCustomError } from '../utils/customError.js';
 import { countTotal, sendError, sendOk } from '../utils/utils.js';
 
 export const CartController = {
@@ -13,7 +14,7 @@ export const CartController = {
     }
   },
   getUserCart: async (req: Request, res: Response) => {
-    const userId = req.params.userId;
+    const userId = req.headers["x-user-id"] as string;
     try {
       const cart = await CartService.getOneByUserId(userId);
       const response = {
@@ -27,7 +28,7 @@ export const CartController = {
     }
   },
   updateUserCart: async (req: Request, res: Response) => {
-    const userId = req.params.userId;
+    const userId = req.headers["x-user-id"] as string;
     try {
       const cart = await CartService.updateOneByUserId(userId, req.body);
       const response = {
@@ -41,7 +42,7 @@ export const CartController = {
     }
   },
   deleteUserCart: async (req: Request, res: Response) => {
-    const userId = req.params.userId;
+    const userId = req.headers["x-user-id"] as string;
     try {
       const cart = await CartService.makeUserCartEmpty(userId);
       if (cart) {
@@ -53,6 +54,21 @@ export const CartController = {
     } catch (error) {
       console.error(`Error updating cart of user: ${ userId }`, error);
       sendError(res, 500, 'Internal Server Error');
+    }
+  },
+  checkout: async (req: Request, res: Response) => {
+    const userId = req.headers["x-user-id"] as string;
+    try {
+      const order = await CartService.checkout(userId);
+      sendOk(res, 200, order)
+    } catch (error) {
+      console.error(`Error creating order for user: ${ userId }:`, error);
+      console.error(error instanceof MyCustomError)
+      if (error instanceof MyCustomError) {
+        sendError(res, error.status, error.message);
+      } else {
+        sendError(res, 500, 'Internal Server Error');
+      }
     }
   }
 }
