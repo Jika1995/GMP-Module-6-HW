@@ -3,10 +3,23 @@
   "version": "1.0.0",
   "description": "Global Mentoring Program - Module 6 - homework",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npx nodemon",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "stop": "pkill -f 'node ./src/index.ts'"
   },
   "keywords": [],
   "author": "Zhibek Andykalykova",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "joi": "^17.12.3",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
 }
