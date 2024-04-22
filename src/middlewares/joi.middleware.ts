@@ -12,7 +12,7 @@ export const joiMiddleware = (schema: Joi.ObjectSchema<any>, property?: string) 
       const { details } = error;
       const message = details.map((i: Joi.ValidationErrorItem) => i.message).join(',');
       console.error('joierror', message);
-      sendError(res, 422, message);
+      sendError(res, 422, `Products are not valid: ${ message }`);
     }
   }
 }

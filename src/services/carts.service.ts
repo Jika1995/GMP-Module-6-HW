@@ -14,7 +14,6 @@ export const CartService = {
   },
   updateOneByUserId: async (userId: string, cartItemBody: CartItemRequestBody): Promise<CartEntity> => {
     const product = await ProductRepository.getOne(cartItemBody.product);
-    console.log('updated with product', product);
     if (!product) {
       throw new MyCustomError(400, `Products are not valid`);
     }

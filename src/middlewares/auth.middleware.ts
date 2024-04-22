@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { UserService } from "../services/user.service.js";
+import { MyCustomError } from "../utils/customError.js";
 import { sendError } from "../utils/utils.js";
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -19,7 +20,11 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
       next(); // Allow access if user exists
     } catch (error) {
       console.error('Error in authentication middleware:', error);
-      sendError(res, 500, 'Internal Server Error');
+      if (error instanceof MyCustomError) {
+        sendError(res, error.status, error.message);
+      } else {
+        sendError(res, 500, 'Internal Server Error');
+      }
     }
   }
 }

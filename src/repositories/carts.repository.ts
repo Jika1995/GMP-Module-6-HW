@@ -51,12 +51,11 @@ export const CartRepository = {
     return cart;
   },
   update: async (userId: string, cartItem: CartItemEntity): Promise<CartEntity> => {
-    const cart = await CartRepository.getOne(userId);
+    const carts = await loadCarts();
+    const cart = carts.find((c: CartEntity) => c.userId === userId);
     if (!cart) {
       throw new MyCustomError(404, `Cart was not found`);
     };
-
-    const carts = await loadCarts();
 
     const cartIdx = carts.findIndex((item) => item.id === cart.id);
     let cartItemIdx = cart?.items.findIndex((item) => item.product.id === cartItem.product.id);

@@ -37,8 +37,12 @@ export const CartController = {
       };
       sendOk(res, 201, response);
     } catch (error) {
-      console.error(`Error updating cart of user: ${ userId }`, error);
-      sendError(res, 500, 'Internal Server Error');
+      console.error(`Error updating order for user: ${ userId }:`, error);
+      if (error instanceof MyCustomError) {
+        sendError(res, error.status, error.message);
+      } else {
+        sendError(res, 500, 'Internal Server Error');
+      }
     }
   },
   deleteUserCart: async (req: Request, res: Response) => {
@@ -52,8 +56,12 @@ export const CartController = {
         sendOk(res, 200, response)
       }
     } catch (error) {
-      console.error(`Error updating cart of user: ${ userId }`, error);
-      sendError(res, 500, 'Internal Server Error');
+      console.error(`Error deleting cart for user: ${ userId }:`, error);
+      if (error instanceof MyCustomError) {
+        sendError(res, error.status, error.message);
+      } else {
+        sendError(res, 500, 'Internal Server Error');
+      }
     }
   },
   checkout: async (req: Request, res: Response) => {

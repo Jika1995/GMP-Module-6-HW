@@ -33,7 +33,7 @@ export const UserRepository = {
     const users = await loadUsers();
     const user = users.find((u: UserEntity) => u.id === userId);
     if (!user) {
-      throw new MyCustomError(404, `User with this id: ${ userId } not found`);
+      throw new MyCustomError(404, `User is not authorized. User with this id: ${ userId } not found`);
     }
     return user;
   },
