@@ -3,6 +3,7 @@ import { randomUUID } from "crypto";
 import { CartEntity } from "../schemas/cart.entity.js";
 import { countTotal } from "../utils/utils.js";
 import { readFile, writeFile } from 'fs/promises';
+import { MyCustomError } from "../utils/customError.js";
 
 const ORDERS_FILE_PATH = 'src/db/orders.json';
 
@@ -34,11 +35,7 @@ export const OrderRepository = {
     const orders = await loadOrders();
     const order = orders.find((p: OrderEntity) => p.id === orderId);
     if (!order) {
-      const customError = {
-        status: 404,
-        message: `Order with this id: ${ orderId } not found`,
-      };
-      throw customError;
+      throw new MyCustomError(404, `Order with this id: ${ orderId } not found`);
     }
     return order;
   },

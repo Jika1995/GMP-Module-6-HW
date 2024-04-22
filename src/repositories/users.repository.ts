@@ -1,6 +1,7 @@
 import { UserEntity } from '../schemas/user.entity.js';
 import { readFile, writeFile } from 'fs/promises';
 import { randomUUID } from "crypto";
+import { MyCustomError } from '../utils/customError.js';
 
 const USERS_FILE_PATH = 'src/db/users.json';
 
@@ -32,12 +33,7 @@ export const UserRepository = {
     const users = await loadUsers();
     const user = users.find((u: UserEntity) => u.id === userId);
     if (!user) {
-      const customError = {
-        status: 404,
-        message: `User with this id: ${ userId } not found`,
-      };
-      console.error('No such user')
-      throw customError;
+      throw new MyCustomError(404, `User with this id: ${ userId } not found`);
     }
     return user;
   },

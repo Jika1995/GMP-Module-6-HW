@@ -3,6 +3,7 @@ import { OrderRepository } from "../repositories/orders.repository.js"
 import { ProductRepository } from "../repositories/products.repository.js"
 import { OrderEntity } from "../schemas/order.entity.js"
 import { CartEntity, CartItemRequestBody } from "../schemas/cart.entity.js"
+import { MyCustomError } from "../utils/customError.js"
 
 export const CartService = {
   getAll: async (): Promise<CartEntity[]> => {
@@ -15,11 +16,7 @@ export const CartService = {
     const product = await ProductRepository.getOne(cartItemBody.product);
     console.log('updated with product', product);
     if (!product) {
-      const customError = {
-        status: 400,
-        message: "Products are not valid"
-      };
-      throw customError;
+      throw new MyCustomError(400, `Products are not valid`);
     }
     const cartItem = {
       product,
@@ -34,11 +31,7 @@ export const CartService = {
   checkout: async (userId: string): Promise<OrderEntity> => {
     const cart = await CartRepository.getOne(userId);
     if (cart.items.length === 0) {
-      const customError = {
-        status: 400,
-        message: "Cart is empty"
-      };
-      throw customError;
+      throw new MyCustomError(400, `Cart is empty`);
     }
     return await OrderRepository.create(userId, cart);
   },

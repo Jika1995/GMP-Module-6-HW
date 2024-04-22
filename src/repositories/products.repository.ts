@@ -1,5 +1,6 @@
 import { ProductEntity } from '../schemas/product.entity.js';
 import { readFile, writeFile } from 'fs/promises';
+import { MyCustomError } from '../utils/customError.js';
 
 const PRODUCTS_FILE_PATH = 'src/db/products.json';
 
@@ -31,11 +32,7 @@ export const ProductRepository = {
     const products = await loadProducts();
     const product = products.find((p: ProductEntity) => p.id === productId);
     if (!product) {
-      const customError = {
-        status: 404,
-        message: `Product with this id: ${ productId } not found`,
-      };
-      throw customError;
+      throw new MyCustomError(404, `Product with this id: ${ productId } not found`);
     }
     return product;
   },

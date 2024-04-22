@@ -63,7 +63,6 @@ export const CartController = {
       sendOk(res, 200, order)
     } catch (error) {
       console.error(`Error creating order for user: ${ userId }:`, error);
-      console.error(error instanceof MyCustomError)
       if (error instanceof MyCustomError) {
         sendError(res, error.status, error.message);
       } else {

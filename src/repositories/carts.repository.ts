@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { readFile, writeFile } from 'fs/promises';
 import { CartEntity, CartItemEntity } from "../schemas/cart.entity.js";
+import { MyCustomError } from "../utils/customError.js";
 
 const CARTS_FILE_PATH = 'src/db/carts.json';
 
@@ -52,11 +53,7 @@ export const CartRepository = {
   update: async (userId: string, cartItem: CartItemEntity): Promise<CartEntity> => {
     const cart = await CartRepository.getOne(userId);
     if (!cart) {
-      const customError = {
-        status: 404,
-        message: 'Cart was not found'
-      }
-      throw customError;
+      throw new MyCustomError(404, `Cart was not found`);
     };
 
     const carts = await loadCarts();
@@ -81,11 +78,7 @@ export const CartRepository = {
     const carts = await loadCarts();
     const cart = carts.find((item) => item.userId === userId);
     if (!cart) {
-      const customError = {
-        status: 404,
-        message: `Cart was not found`,
-      };
-      throw customError;
+      throw new MyCustomError(404, `Cart was not found`);
     };
     cart.items = [];
     const cartIdx = carts.findIndex((item) => item.userId === userId);
